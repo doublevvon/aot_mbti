@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>나는 진격의 거인 누구? MBTI 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e7ebe8;--surface:#f7f9f7;--ink:#1a2620;--muted:#58675f;--line:#c4cec8;
+  --accent:#2c5a43;--accent-ink:#fff;--brass:#9a6b12;--chip:#dde4df;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1512;--surface:#18211c;--ink:#e6ece8;--muted:#9bb0a4;--line:#2c3a33;
+  --accent:#7fc29b;--accent-ink:#0f1512;--brass:#e0b052;--chip:#222f28;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1512;--surface:#18211c;--ink:#e6ece8;--muted:#9bb0a4;--line:#2c3a33;
+  --accent:#7fc29b;--accent-ink:#0f1512;--brass:#e0b052;--chip:#222f28;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:40px 20px 80px}
+h1,h2,.big{font-family:"Noto Serif KR",Georgia,"Apple SD Gothic Neo",serif;letter-spacing:-.02em}
+h1{font-size:clamp(28px,7vw,42px);line-height:1.25;margin:0 0 12px;font-weight:900}
+.lead{color:var(--muted);margin:0 0 28px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:14px 20px;cursor:pointer;background:var(--accent);color:var(--accent-ink);width:100%}
+.btn.ghost{background:var(--chip);color:var(--ink);font-weight:500}
+button:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.prog{height:6px;background:var(--chip);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.prog i{display:block;height:100%;background:var(--accent);width:0}
+.count{font-size:14px;color:var(--muted);margin:0 0 22px}
+h2{font-size:clamp(20px,4.5vw,24px);line-height:1.45;margin:0 0 20px;font-weight:700}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--chip)}
+.nav{display:flex;gap:10px;margin-top:8px}
+.big{font-size:clamp(44px,14vw,72px);font-weight:900;line-height:1.1;margin:0;color:var(--brass)}
+.name{font-size:clamp(24px,6vw,32px);font-weight:900;margin:4px 0 12px}
+.axis{margin:18px 0 0}
+.axis div.l{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:4px}
+.axis .bar{height:8px;background:var(--chip);border-radius:4px;overflow:hidden}
+.axis .bar i{display:block;height:100%;background:var(--accent)}
+.row{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.row .btn{flex:1;min-width:140px}
+details{margin-top:28px}
+summary{cursor:pointer;font-weight:700}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
+td,th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+tr.me td{background:var(--chip);font-weight:700}
+.scroll{overflow-x:auto}
+.fine{font-size:13px;color:var(--muted);margin-top:24px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="start">
+    <h1>나는 진격의 거인의 누구일까?</h1>
+    <p class="lead">12가지 상황에서 끌리는 쪽을 고르면, MBTI와 가장 닮은 인물을 알려드려요. 1분이면 끝나요.</p>
+    <div class="card">
+      <p style="margin-top:0">※ 인물별 MBTI는 팬들 사이에 널리 퍼진 해석을 정리한 것으로, 공식 설정이 아니에요. 출처에 따라 다를 수 있어요. 결과 설명에는 큰 줄거리 스포일러가 없도록 썼어요.</p>
+      <button class="btn" id="go" type="button">테스트 시작하기</button>
+    </div>
+  </section>
+
+  <section id="quiz" hidden>
+    <div class="prog" aria-hidden="true"><i id="bar"></i></div>
+    <p class="count" id="count"></p>
+    <div class="card">
+      <h2 id="q"></h2>
+      <div id="opts"></div>
+      <div class="nav"><button class="btn ghost" id="back" type="button">이전 질문</button></div>
+    </div>
+  </section>
+
+  <section id="result" hidden aria-live="polite">
+    <div class="card">
+      <p class="big" id="rType"></p>
+      <p class="name" id="rName"></p>
+      <p id="rDesc" style="margin:0"></p>
+      <div id="axes"></div>
+      <div class="row">
+        <button class="btn" id="copy" type="button">결과 복사하기</button>
+        <button class="btn ghost" id="again" type="button">다시 하기</button>
+      </div>
+      <p class="fine" id="msg" role="status"></p>
+    </div>
+    <details>
+      <summary>16가지 유형 전체 보기</summary>
+      <div class="scroll"><table id="all"></table></div>
+    </details>
+    <p class="fine">팬 해석 기반의 비공식 재미용 테스트입니다. 실제 MBTI 검사 결과와는 다를 수 있어요.</p>
+  </section>
+</div>
+
+<script>
+var Q = [
+  ["E","I","작전 회의 전, 에너지를 채우는 방법은?","동료들과 떠들고 웃으면서","조용히 혼자 생각을 정리하면서"],
+  ["E","I","새 부대에 배치된 첫날, 나는?","먼저 다가가 말을 건다","누가 말 걸 때까지 상황을 지켜본다"],
+  ["E","I","힘든 임무 후 가장 필요한 건?","다 같이 모여 수다 떨기","혼자만의 시간"],
+  ["S","N","정찰 임무에서 내가 더 신경 쓰는 건?","눈앞의 지형과 확실한 현재 상황","전체 흐름과 앞으로의 가능성"],
+  ["S","N","풀리지 않는 미스터리를 마주했을 때?","확인된 증거부터 차근차근 모은다","직감으로 가설을 세우고 연결해 본다"],
+  ["S","N","나에게 더 가까운 말은?","현실적이고 구체적이다","상상력이 풍부하고 추상적이다"],
+  ["T","F","동료가 위험한 선택을 하려 할 때?","득실과 성공 확률부터 따져 말한다","그 사람의 마음과 이유부터 듣는다"],
+  ["T","F","팀의 중요한 결정에서 더 중요한 건?","논리와 효율","사람들의 감정과 조화"],
+  ["T","F","친구가 실수했을 때 나는?","원인을 짚어 주고 해결책을 제시한다","먼저 공감하고 기운을 북돋는다"],
+  ["J","P","작전을 준비할 때?","계획을 세우고 그대로 따른다","큰 틀만 잡고 상황 보며 움직인다"],
+  ["J","P","마감이 다가올 때 나는?","미리미리 끝내 놓는다","막판에 몰입해서 해낸다"],
+  ["J","P","여행 일정은?","시간대별로 촘촘하게 짠다","발길 닿는 대로 즉흥으로"]
+];
+var C = {
+  ISTJ:["리바이","원칙과 책임감으로 움직이는 현실주의자. 말수는 적지만 맡은 일은 끝까지 해내요."],
+  ISFJ:["미카사","소중한 사람을 지키는 일에 모든 것을 거는 헌신형. 겉은 담담해도 마음은 깊어요."],
+  INFJ:["아르민","통찰력과 공감 능력으로 사람들을 이끄는 전략가. 말로 상황을 바꾸는 힘이 있어요."],
+  INTJ:["지크","냉철하게 큰 그림을 설계하는 분석가. 자기만의 확고한 계획과 신념이 있어요."],
+  ISTP:["에렌","목표가 정해지면 거침없이 직진하는 행동파. 강한 의지와 자유를 향한 열망이 있어요."],
+  ISFP:["피크","조용히 상황을 관찰하며 자기 페이스를 지키는 유형. 느긋해 보여도 감각이 날카로워요."],
+  INFP:["히스토리아","내면의 신념과 가치를 소중히 여기는 이상주의자. 스스로 선택한 삶을 찾아가요."],
+  INTP:["애니","혼자 생각하고 판단하는 독립적인 분석가. 쉽게 속을 드러내지 않아요."],
+  ESTP:["플로크","현실 감각이 빠르고 대담하게 밀어붙이는 실행가. 위기 상황에서 결단이 빨라요."],
+  ESTJ:["라이너","책임감 강하고 팀을 이끌려는 리더형. 맡은 역할을 무겁게 짊어져요."],
+  ESFP:["사샤","분위기를 밝히는 자유로운 에너자이저. 솔직하고 본능에 충실해요."],
+  ENFP:["코니","유쾌하고 호기심 많은 분위기 메이커. 사람들 사이에 활력을 불어넣어요."],
+  ESFJ:["장","현실적이고 정 많은 팀워크형. 투덜대면서도 동료를 끝까지 챙겨요."],
+  ENFJ:["가비","열정적으로 신념을 따르며 사람들을 이끄는 유형. 목표를 향한 에너지가 커요."],
+  ENTP:["한지","호기심이 넘치는 발명가형 탐구자. 새로운 아이디어와 연구에 끌려요."],
+  ENTJ:["에르빈","목표를 위해 판을 짜고 사람들을 이끄는 카리스마 지휘관. 큰 결단도 마다하지 않아요."]
+};
+var AX = [["E","I","외향","내향"],["S","N","감각","직관"],["T","F","사고","감정"],["J","P","판단","인식"]];
+var $ = function(id){return document.getElementById(id)};
+var idx = 0, ans = [];
+
+function show(id){["start","quiz","result"].forEach(function(s){$(s).hidden = s!==id});window.scrollTo(0,0)}
+function ask(){
+  var q = Q[idx];
+  $("q").textContent = q[2];
+  $("count").textContent = (idx+1) + " / " + Q.length;
+  $("bar").style.width = (idx/Q.length*100) + "%";
+  $("back").hidden = idx===0;
+  var html = "";
+  [3,4].forEach(function(k,i){
+    var on = ans[idx]===i ? "true" : "false";
+    html += '<button type="button" class="opt" aria-pressed="'+on+'" data-i="'+i+'">'+q[k]+'</button>';
+  });
+  $("opts").innerHTML = html;
+}
+$("go").onclick = function(){idx=0;ans=[];show("quiz");ask()};
+$("back").onclick = function(){if(idx>0){idx--;ask()}};
+$("opts").onclick = function(e){
+  var b = e.target.closest(".opt"); if(!b) return;
+  ans[idx] = +b.getAttribute("data-i");
+  if(idx < Q.length-1){idx++;ask()} else finish();
+};
+function finish(){
+  var score = {}, type = "";
+  Q.forEach(function(q,n){var l = q[ans[n]]; score[l]=(score[l]||0)+1});
+  var html = "";
+  AX.forEach(function(a){
+    var x = score[a[0]]||0, y = score[a[1]]||0;
+    type += x>y ? a[0] : a[1];
+    html += '<div class="axis"><div class="l"><span>'+a[2]+' ('+a[0]+') '+x+'</span><span>'+a[3]+' ('+a[1]+') '+y+'</span></div><div class="bar"><i style="width:'+(x/(x+y)*100)+'%"></i></div></div>';
+  });
+  $("rType").textContent = type;
+  $("rName").textContent = "당신은 " + C[type][0] + "!";
+  $("rDesc").textContent = C[type][1];
+  $("axes").innerHTML = html;
+  var rows = "<tr><th>MBTI</th><th>인물</th></tr>";
+  Object.keys(C).forEach(function(k){rows += '<tr'+(k===type?' class="me"':'')+'><td>'+k+'</td><td>'+C[k][0]+'</td></tr>'});
+  $("all").innerHTML = rows;
+  $("msg").textContent = "";
+  $("bar").style.width = "100%";
+  show("result");
+}
+$("again").onclick = function(){idx=0;ans=[];show("start")};
+$("copy").onclick = function(){
+  var t = "나는 진격의 거인에서 " + C[$("rType").textContent][0] + "(" + $("rType").textContent + ")! 너는 누구일까?";
+  function ok(v){$("msg").textContent = v ? "복사했어요! 친구에게 공유해 보세요." : "복사가 안 돼요. 결과를 직접 캡처해 주세요."}
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){ok(true)},function(){ok(false)})}
+    else ok(false);
+  }catch(e){ok(false)}
+};
+</script>
+</body>
+</html>
